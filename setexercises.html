@@ -13,7 +13,7 @@
 	<link href="css/limberSpecific.css" rel="stylesheet"/>
 	<script>
 	
-		
+		var vidInd;
 		if (localStorage.getItem("listsOfSets") != null) {
 					playlists = JSON.parse(localStorage.getItem("listsOfSets"));
 
@@ -96,7 +96,7 @@
 		};
 
 		function moveUp() {
-			var indexThis = editSet.vids.indexOf(arguments[0]);
+			var indexThis = arguments[0];
 			//var indexThis = editSet.vids.findIndex( x => x.title == arguments[0].title);
 			//var indexThis = arguments[0].index;
 			if (indexThis > 0)
@@ -105,7 +105,6 @@
 				editSet.vids[indexThis] = editSet.vids[indexThis - 1];
 				editSet.vids[indexThis-1] = tmp;
 			}
-			console.log(arguments[0].title);
 			playlists[localStorage.getItem("currentSet")] = editSet;
 			localStorage.setItem("listsOfSets", JSON.stringify(playlists));
 			location.reload();
@@ -113,23 +112,52 @@
 		
 		function deleteSet()
 		{
-			var ind = playlists.indexOf(localStorage.getItem("currentSet"));
+			var ind = localStorage.getItem("currentSet");
 			playlists.splice(ind, 1);
 			localStorage.setItem("listsOfSets", JSON.stringify(playlists));
 		}
 		
 		//deletes item
 		function deleteVid() {
-			var indSet = editSet.vids.findIndex(x => x.title == arguments[0].title) ;
+			var indSet = vidInd ;
 		//	var element1 = document.getElementById("element" + indexThis);
 			//element1.style.display = "none";
 			editSet.vids.splice(indSet,1);
 			localStorage.setItem("listsOfSets", JSON.stringify(playlists));
 			location.reload();
 		};
+		
+		function openModal() {
+			$('#conModal').modal('show');
+			vidInd = arguments[0];
+			//If the user clicks on "create" button, then call appendList
+			var createBtn = document.getElementById("deleteButton");
+			createBtn.addEventListener('click', deleteVid);
+		}
 	</script>
 </head>
 <body>
+<!-- delete modal confirm -->
+<div class="modal fade" id="conModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Exercise Video</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+	  <div class = "modal-body">
+		Would you like to remove this exercise video from this exercise set?
+	  </div>
+      <div class="modal-footer">
+		<button type="button" class="btn btn-success" data-dismiss="modal">Cancel</button>
+        <a href = "#" id = "deleteButton" class="btn btn-danger" role = "button" >Delete Exercise</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- collapsible navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
 	<a href = "playlistAll.html">
@@ -145,8 +173,8 @@
 	<div class="collapse navbar-collapse" id="limberNavBar">
 		<div class="navbar-nav mr-auto mt-2 mt-md-0">
 			<a class="nav-item nav-link" href="targetareaF.html">Pick Target Area</a>
-			<a class="nav-item nav-link" href="playlistAll.html">Exercise Sets</a>
-			<a class="nav-item nav-link" href="history.html">History</a>
+			<a class="nav-item nav-link" href="playlistAll.html">My Exercise Sets</a>
+			<a class="nav-item nav-link" href="history.html">Video History</a>
 			<a class="nav-item nav-link" href="index.html">Log Out</a>
 		</div>
 	</div>
@@ -190,8 +218,8 @@
 								
 							</div>
 							<div class="row"> <!--onclick="dropdownFunct({{json this}})"-->
-								<button onclick = "moveUp({{json this}})" class = "btn btn-warning">^</button>
-								<button onclick="deleteVid({{json this}})" class="btn btn-warning">X</button>
+								<button onclick = "moveUp({{@index}})" type="button" class="btn btn-warning"><span class="glyphicon glyphicon-chevron-up"></span> Move Up</button>
+								<button onclick="openModal({{@index}})" class="btn btn-danger">Delete</button>
 							</div>
 						</div>
 					</div>
